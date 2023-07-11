@@ -1,0 +1,72 @@
+
+#include <iostream>
+#include <fstream>
+
+using namespace std;
+
+
+    const int MAX_ESTUDIANTES = 100;
+    const int MAX_NOTAS = 5;
+    const int MAX_MATERIAS = 10;
+
+    struct Estudiante {
+        string nombre;
+        string genero;
+        string email;
+        string genero;
+        string notas[MAX_NOTAS];
+    };
+
+    struct Materia {
+        string nombre;
+        Estudiante estudiantes[MAX_ESTUDIANTES];
+        string cantidadAlumnos;
+    };
+int CargarEstudiantes(Estudiante estudiantes[MAX_ESTUDIANTES]){
+    ifstream archivo("estudiantes.csv");
+    int cantidadEstudiantes = 0;
+    if (archivo.is_open()){
+        string linea;
+            while (getline(archivo, linea, ';')){
+                Estudiante estudiante;
+                    size_t pos = 0;
+                    string token;
+                    int index = 0;
+                    while ((pos = linea.find(";"))!= string::npos){
+                        token = linea.substr(0, pos);
+                        switch (index) {
+                            case 0:
+                            estudiante.nombre = token;
+                            break;
+                            case 1:
+                            estudiante.apellido = token;
+                            break;
+                            case 2:
+                            estudiante.email = token;
+                            break;
+                            case 3:
+                            estudiante.genero = token;
+                            break;
+                            default:
+                            estudiante.notas[index - 4] = token;
+                            break;
+
+                        }
+                        linea.erase(0, pos + 1);
+                        index++;
+                    }
+                    estudiantes[cantidadEstudiantes] = estudiante;
+                    cantidadEstudiantes++;
+                }
+            archivo.close();
+    }
+    return cantidadEstudiantes;
+}
+
+    float CalcularPromedio (const Estudiante& estudiante) {
+        float suma = 0.0;
+        for (int i = 0; i < MAX_NOTAS; i++){
+            suma+= stof(estudiante.notas[i]);
+        }
+        return suma / MAX_NOTAS;
+    }
