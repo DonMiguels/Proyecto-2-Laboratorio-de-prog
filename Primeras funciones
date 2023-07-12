@@ -1,72 +1,155 @@
 
 #include <iostream>
 #include <fstream>
+#include <string>
 
 using namespace std;
 
+const int MAX_ESTUDIANTES = 1200;
+const int MAX_NOTAS = 6;
 
-    const int MAX_ESTUDIANTES = 100;
-    const int MAX_NOTAS = 5;
-    const int MAX_MATERIAS = 10;
-
-    struct Estudiante {
-        string nombre;
-        string genero;
-        string email;
-        string genero;
-        string notas[MAX_NOTAS];
-    };
-
-    struct Materia {
+struct Estudiante {
+    string nombre;
+    string apellido;
+    string email;
+    string genero;
+    string notas[MAX_NOTAS];
+};
+struct Materia {
         string nombre;
         Estudiante estudiantes[MAX_ESTUDIANTES];
         string cantidadAlumnos;
     };
-int CargarEstudiantes(Estudiante estudiantes[MAX_ESTUDIANTES]){
-    ifstream archivo("estudiantes.csv");
-    int cantidadEstudiantes = 0;
-    if (archivo.is_open()){
-        string linea;
-            while (getline(archivo, linea, ';')){
-                Estudiante estudiante;
-                    size_t pos = 0;
-                    string token;
-                    int index = 0;
-                    while ((pos = linea.find(";"))!= string::npos){
-                        token = linea.substr(0, pos);
-                        switch (index) {
-                            case 0:
-                            estudiante.nombre = token;
-                            break;
-                            case 1:
-                            estudiante.apellido = token;
-                            break;
-                            case 2:
-                            estudiante.email = token;
-                            break;
-                            case 3:
-                            estudiante.genero = token;
-                            break;
-                            default:
-                            estudiante.notas[index - 4] = token;
-                            break;
 
-                        }
-                        linea.erase(0, pos + 1);
-                        index++;
-                    }
-                    estudiantes[cantidadEstudiantes] = estudiante;
-                    cantidadEstudiantes++;
+float calcularPromedio(const Estudiante& estudiante) {
+    float suma = 0.0;
+    int contador = 0;
+    for (int i = 0; i < MAX_NOTAS; i++) {
+        if (!estudiante.notas[i].empty()){
+            try{
+                suma+= stof(estudiante.notas[i]);
+                contador++;
+            } catch (const invalid_argument&){
+
+            }
+        }
+       
+    }
+    return contador > 0 ? suma / contador : 0.0;
+}
+
+int cargarEstudiantes(Estudiante estudiantes[MAX_ESTUDIANTES]) {
+    ifstream archivo("Datos_Estudiantes_revisado.csv");
+    int cantidadEstudiantes = 0;
+    if (archivo.is_open()) {
+        string linea;
+        int numeroLinea = 0;
+        while (getline(archivo, linea)) {
+            numeroLinea++;
+            if (numeroLinea > 1){
+            Estudiante estudiante;
+            size_t pos = 0;
+            string token;
+            int index = 0;
+            while ((pos = linea.find(";")) != string::npos) {
+                token = linea.substr(0, pos);
+                switch (index) {
+                    case 0:
+                        estudiante.nombre = token;
+                        break;
+                    case 1:
+                        estudiante.apellido = token;
+                        break;
+                    case 2:
+                        estudiante.email = token;
+                        break;
+                    case 3:
+                        estudiante.genero = token;
+                        break;
+                    default:
+                        estudiante.notas[index - 5] = token;
+                        break;
                 }
-            archivo.close();
+                linea.erase(0, pos + 1);
+                index++;
+            }
+            estudiantes[cantidadEstudiantes] = estudiante;
+            cantidadEstudiantes++;
+        }
+        }
+        archivo.close();
     }
     return cantidadEstudiantes;
 }
 
-    float CalcularPromedio (const Estudiante& estudiante) {
-        float suma = 0.0;
-        for (int i = 0; i < MAX_NOTAS; i++){
-            suma+= stof(estudiante.notas[i]);
+void guardarEstudiantes(const Estudiante estudiantes[MAX_ESTUDIANTES], int cantidadEstudiantes) {
+    ofstream archivo("Datos_Estudiantes_revisado.csv");
+    if (archivo.is_open()) {
+        for (int i = 0; i < cantidadEstudiantes; i++) {
+            archivo << estudiantes[i].nombre << ";" << estudiantes[i].apellido << ";" << estudiantes[i].email << ";"
+                    << estudiantes[i].genero;
+            for (int j = 0; j < MAX_NOTAS; j++) {
+                archivo << ";" << estudiantes[i].notas[j];
+            }
+            archivo << endl;
         }
-        return suma / MAX_NOTAS;
+        archivo.close();
+    }
+}
+
+void mostrarEstudiantes(const Estudiante estudiantes[MAX_ESTUDIANTES], int cantidadEstudiantes) {
+    cout << "Estudiantes y sus notas promedio:" << endl;
+    for (int i = 0; i < cantidadEstudiantes; i++) {
+        float promedio = calcularPromedio(estudiantes[i]);
+        cout << "Nombre: " << estudiantes[i].nombre << " " << estudiantes[i].apellido << ", Promedio: " << promedio << endl;
+    }
+}
+void buscarEstudiante(const Estudiante estudiantes[MAX_ESTUDIANTES], int cantidadEstudiantes, const string& nombre){
+    bool encontrado = false;
+    for (int i = 0; i < cantidadEstudiantes; i++){
+        if (estudiantes[i].nombre == nombre){
+            float promedio = calcularPromedio(estudiantes[i]);
+            cout << "nombre: " << estudiantes[i].nombre << " "<< estudiantes[i].apellido << " Su promedio es: " ;
+            if (promedio > 0) {
+                cout << promedio <<endl;
+            }
+            else{
+                cout << " Las notas son invalidas, Verificalas y vuelve a intentarlo";
+            }
+            encontrado = true;
+            break;
+        }
+       
+    } 
+     if (!encontrado){
+            cout << " Lo siento, no se encontro el estudiante"<<endl;
+        }
+}
+void OpBuscarEstudiante(const Estudiante estudiantes[MAX_ESTUDIANTES], int cantidadEstudiantes){
+string nombre;
+cout <<"ingrese el nombre del estudiante que deseas buscar: ";
+cin >> nombre;
+
+buscarEstudiante(estudiantes, cantidadEstudiantes, nombre);
+}
+
+void OpMostrarTodosLosEstudiantes(const Estudiante estudiantes[MAX_ESTUDIANTES], int cantidadEstudiantes){
+    mostrarEstudiantes(estudiantes, cantidadEstudiantes);
+}
+
+int main() {
+Estudiante estudiantes[MAX_ESTUDIANTES];
+int cantidadEstudiantes = cargarEstudiantes(estudiantes);
+
+    int datos;
+cout<< "presiona 1 o 2 para activar el programa"<<endl;
+cin>> datos;
+
+if(datos==1){
+    OpMostrarTodosLosEstudiantes(estudiantes,cantidadEstudiantes);
+}
+if(datos == 2){
+    OpBuscarEstudiante(estudiantes, cantidadEstudiantes);
+}
+return 0;
     }
