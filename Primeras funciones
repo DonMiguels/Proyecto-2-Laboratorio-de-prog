@@ -137,6 +137,35 @@ void OpMostrarTodosLosEstudiantes(const Estudiante estudiantes[MAX_ESTUDIANTES],
     mostrarEstudiantes(estudiantes, cantidadEstudiantes);
 }
 
+void agregarEstudiante(Estudiante estudiantes[MAX_ESTUDIANTES], int& cantidadEstudiantes) {
+    if (cantidadEstudiantes >= MAX_ESTUDIANTES) {
+        cout << "No se pueden agregar más estudiantes. La capacidad máxima ha sido alcanzada." << endl;
+        return;
+    }
+
+    Estudiante nuevoEstudiante;
+    cout << "Ingrese los datos del nuevo estudiante:" << endl;
+    cout << "Nombre: ";
+    cin >> nuevoEstudiante.nombre;
+    cout << "Apellido: ";
+    cin >> nuevoEstudiante.apellido;
+    cout << "Email: ";
+    cin >> nuevoEstudiante.email;
+    cout << "Género: ";
+    cin >> nuevoEstudiante.genero;
+    cout << "Notas (separadas por espacios): ";
+    for (int i = 0; i < MAX_NOTAS; i++) {
+        cin >> nuevoEstudiante.notas[i];
+    }
+
+    estudiantes[cantidadEstudiantes] = nuevoEstudiante;
+    cantidadEstudiantes++;
+
+    guardarEstudiantes(estudiantes, cantidadEstudiantes);
+
+    cout << "El estudiante ha sido agregado correctamente." << endl;
+}
+
 int main() {
 Estudiante estudiantes[MAX_ESTUDIANTES];
 int cantidadEstudiantes = cargarEstudiantes(estudiantes);
@@ -149,7 +178,7 @@ if(datos==1){
     OpMostrarTodosLosEstudiantes(estudiantes,cantidadEstudiantes);
 }
 if(datos == 2){
-    OpBuscarEstudiante(estudiantes, cantidadEstudiantes);
+    agregarEstudiante(estudiantes, cantidadEstudiantes);
 }
 return 0;
     }
