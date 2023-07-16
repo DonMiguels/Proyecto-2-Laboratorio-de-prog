@@ -292,29 +292,114 @@ void mostrarTop10Promedios(const Estudiante estudiantes[MAX_ESTUDIANTES], int ca
     }
 }
 
+void obtenerProporcionGenerosMateria(const Estudiante estudiantes[MAX_ESTUDIANTES], int cantidadEstudiantes, const string& materia) {
+    int indiceMateria = obtenerIndiceMateria(materia);
+    if (indiceMateria == -1) {
+        cout << "La materia especificada no fue encontrada." << endl;
+        return;
+    }
+
+    float hombresAprobados = 0;
+    float mujeresAprobadas = 0;
+    float hombresAplazados = 0;
+    float mujeresAplazadas = 0;
+    float totalAprobados = 0;
+    float totalAplazados = 0;
+    float CarmenAprobados = 0;
+    float CarmenAplazados = 0;
+
+    for (int i = 0; i < cantidadEstudiantes; i++) {
+        if (!estudiantes[i].notas[indiceMateria].empty()) {
+            float nota = stof(estudiantes[i].notas[indiceMateria]);
+            if (nota >= 9.46) {
+                if (estudiantes[i].genero == "Masculino"|| estudiantes[i].genero == "Male") {
+                    hombresAprobados++;
+                } else if (estudiantes[i].genero == "Femenino"|| estudiantes[i].genero == "Female") {
+                    mujeresAprobadas++;
+                } else if (estudiantes[i].genero != "Femenino"|| estudiantes[i].genero != "Masculino" || estudiantes[i].genero != "Male"|| estudiantes[i].genero != "Female") {
+                    CarmenAprobados++;
+                }
+                totalAprobados++;
+            } else if (nota < 9.45) {
+                if (estudiantes[i].genero == "Masculino"|| estudiantes[i].genero == "Male") {
+                    hombresAplazados++;
+                } else if (estudiantes[i].genero == "Femenino"|| estudiantes[i].genero == "Female") {
+                    mujeresAplazadas++;
+                } else if (estudiantes[i].genero != "Femenino"|| estudiantes[i].genero != "Masculino" || estudiantes[i].genero != "Male"|| estudiantes[i].genero != "Female") {
+                    CarmenAplazados++;
+                }
+                totalAplazados++;
+            }
+        }
+    }
+
+    cout << "Proporción de géneros en la materia " << materia << " :" << endl;
+    cout << "Aprobados: " << endl << "Hombres: " << hombresAprobados << " (" << (hombresAprobados / (totalAprobados)) * 100 << "%)"<< endl << "Mujeres: " << mujeresAprobadas << " (" << (mujeresAprobadas / (totalAprobados)) * 100 << "%)" << endl << " Carmen: "<<CarmenAprobados << " ("<< (CarmenAprobados/(totalAprobados)) * 100 << "%)" << endl << endl;
+    
+    cout << "Aplazados: " << endl << " Hombres: " << hombresAplazados << " (" << (hombresAplazados / (totalAplazados)) * 100 << "%)"<< endl << " Mujeres: " << mujeresAplazadas << " (" << (mujeresAplazadas / (totalAplazados)) * 100 << "%)" << endl << " Carmen: "<<CarmenAplazados << " ("<< (CarmenAplazados/(totalAprobados)) * 100 << "%)" << endl << endl;
+}
+
 
 int main() {
-Estudiante estudiantes[MAX_ESTUDIANTES];
+    Estudiante estudiantes[MAX_ESTUDIANTES];
     int cantidadEstudiantes = cargarEstudiantes(estudiantes);
 
-    int datos;
-    cout << "Presione 1 o 2 para activar el programa: ";
-    cin >> datos;
+    int opcion;
+    while (true) {
+         cout << "============================== Menú ================================" << endl;
+    cout << "Presiona (1). Mostrar todos los estudiantes y sus promedios" << endl;
+    cout << "Presiona (2). Buscar estudiante" << endl;
+    cout << "Presiona (3). Editar información de un estudiante" << endl;
+    cout << "Presiona (4). Verificar notas de una materia" << endl;
+    cout << "Presiona (5). Mostrar top 10 mejores promedios"<<endl;
+    cout << "Presiona (6). Proporcion de estudiantes aplazados y aprobados por genero"<<endl;
+    cout << "Presiona (7). Salir" << endl;
+    cout << "==========================================================================" << endl;
+    cout << "Ingrese la opción deseada: ";
+        cin >> opcion;
+    
+    switch (opcion) {
+            case 1:
+               { mostrarEstudiantes(estudiantes, cantidadEstudiantes);}
+                break;
+            case 2:
+                {
+                    string nombre;
+                    cout << "Ingrese el nombre del estudiante que desea buscar: ";
+                    cin >> nombre;
+                    buscarEstudiante(estudiantes, cantidadEstudiantes, nombre);
+                }
+                break;
+            case 3:
+                editarInformacionEstudiante(estudiantes, cantidadEstudiantes);
+                break;
+            case 4:
+                {
+                    string materia;
+                    cout << "Ingrese el nombre de la materia: ";
+                    cin >> materia;
+                    verificarNotasMateria(estudiantes, cantidadEstudiantes, materia);
+                }
+                break;
+            case 5:
+                {mostrarTop10Promedios(estudiantes, cantidadEstudiantes);}
+                break;
+            case 6:
+            {string materia;
+            cout << "ingrese el nombre de la materia: "<<endl;
+            cin >> materia;
+            obtenerProporcionGenerosMateria(estudiantes, cantidadEstudiantes, materia);}
+            break;
+            case 7:
+            {cout << "Saliendo del programa..." << endl;}
+            return 0;
+            default:
+                {cout << "Opción inválida. Intente nuevamente." << endl;}
+                break;
+        }
 
-    if (datos == 1) {
-        OpMostrarTodosLosEstudiantes(estudiantes, cantidadEstudiantes);
-    } else if (datos == 2) {
-       editarInformacionEstudiante(estudiantes, cantidadEstudiantes);
-    } else {
-        cout << "Opción inválida." << endl;
-        return 1;
+        cout << endl;
     }
-    verificarNotasMateria(estudiantes, cantidadEstudiantes, "Matematicas");
-    verificarNotasMateria(estudiantes, cantidadEstudiantes, "Sociales");
-    verificarNotasMateria(estudiantes, cantidadEstudiantes, "Biologia");
-    verificarNotasMateria(estudiantes, cantidadEstudiantes, "Fisica");
-    verificarNotasMateria(estudiantes, cantidadEstudiantes, "Educacion Fisica");
-    verificarNotasMateria(estudiantes, cantidadEstudiantes, "Artes");
 
     return 0;
 }
