@@ -46,36 +46,40 @@ int cargarEstudiantes(Estudiante estudiantes[MAX_ESTUDIANTES]) {
         int numeroLinea = 0;
         while (getline(archivo, linea)) {
             numeroLinea++;
-            if (numeroLinea > 1){
-            Estudiante estudiante;
-            size_t pos = 0;
-            string token;
-            int index = 0;
-            while ((pos = linea.find(";")) != string::npos) {
-                token = linea.substr(0, pos);
-                switch (index) {
-                    case 0:
-                        estudiante.nombre = token;
-                        break;
-                    case 1:
-                        estudiante.apellido = token;
-                        break;
-                    case 2:
-                        estudiante.email = token;
-                        break;
-                    case 3:
-                        estudiante.genero = token;
-                        break;
-                    default:
-                        estudiante.notas[index - 5] = token;
-                        break;
+            if (numeroLinea > 1) {
+                Estudiante estudiante;
+                size_t pos = 0;
+                string token;
+                int index = 0;
+                while ((pos = linea.find(";")) != string::npos) {
+                    token = linea.substr(0, pos);
+                    switch (index) {
+                        case 0:
+                            estudiante.nombre = token;
+                            break;
+                        case 1:
+                            estudiante.apellido = token;
+                            break;
+                        case 2:
+                            estudiante.email = token;
+                            break;
+                        case 3:
+                            estudiante.genero = token;
+                            break;
+                        default:
+                            estudiante.notas[index - 4] = token;
+                            break;
+                    }
+                    linea.erase(0, pos + 1);
+                    index++;
                 }
-                linea.erase(0, pos + 1);
-                index++;
+                if(!linea.empty()){
+                    estudiante.notas[index - 4] = linea;
+                // corregi el error del salto de linea
+                }
+                estudiantes[cantidadEstudiantes] = estudiante;
+                cantidadEstudiantes++;
             }
-            estudiantes[cantidadEstudiantes] = estudiante;
-            cantidadEstudiantes++;
-        }
         }
         archivo.close();
     }
@@ -105,22 +109,25 @@ void mostrarEstudiantes(const Estudiante estudiantes[MAX_ESTUDIANTES], int canti
     }
 }
 void imprimirBoletaEstudiante(const Estudiante& estudiante) {
-    cout <<endl<< endl<<  "========Boleta de Notas========" << endl;
-    cout << "Nombre: " << estudiante.nombre << " " << estudiante.apellido << endl;
-    cout << "Email: " << estudiante.email << endl;
-    cout << "Genero: " << estudiante.genero << endl;
-    cout << "Notas:" << endl;
-    for (int i = 0; i < MAX_NOTAS; i++) {
-        cout << "Nota " << i+1 << ": " << estudiante.notas[i] << endl;
-    }
-}
 
+    
+    cout << endl << endl << "========Boleta de Notas========" << endl;
+    cout << "Email: " << estudiante.email << endl;
+    cout << "Genero: " << estudiante.genero << endl << endl;
+    cout << endl << endl << "Notas:" << endl;
+    for (int i = 0; i < MAX_NOTAS; i++) {
+        cout << "Nota " << i + 1 << ": " << estudiante.notas[i] << endl;
+        
+    }
+
+     
+}
 void buscarEstudiante(const Estudiante estudiantes[MAX_ESTUDIANTES], int cantidadEstudiantes, const string& nombre) {
     bool encontrado = false;
     for (int i = 0; i < cantidadEstudiantes; i++) {
         if (estudiantes[i].nombre == nombre) {
-            float promedio = calcularPromedio(estudiantes[i]);
-cout << "Nombre: " << estudiantes[i].nombre << " " << estudiantes[i].apellido << ", Email: " << estudiantes[i].email << ", Genero: " << estudiantes[i].genero << ", Su promedio es: ";
+            float promedio = calcularPromedio(estudiantes[i]); 
+            cout << "Nombre: " << estudiantes[i].nombre << " " << estudiantes[i].apellido; 
             if (promedio > 0) {
                 cout << promedio << endl;
                 imprimirBoletaEstudiante(estudiantes[i]);
@@ -136,13 +143,94 @@ cout << "Nombre: " << estudiantes[i].nombre << " " << estudiantes[i].apellido <<
     }
 }
 
-
 void OpBuscarEstudiante(const Estudiante estudiantes[MAX_ESTUDIANTES], int cantidadEstudiantes){
 string nombre;
 cout <<"ingrese el nombre del estudiante que deseas buscar: ";
 cin >> nombre;
 
 buscarEstudiante(estudiantes, cantidadEstudiantes, nombre);
+}
+int obtenerIndiceMateria(const string& materia) {
+    if (materia == "Matematicas") {
+        return 0;
+    } else if (materia == "Sociales") {
+        return 1;
+    } else if (materia == "Biologia") {
+        return 2;
+    } else if (materia == "Fisica") {
+        return 3;
+    } else if (materia == "Educacion Fisica") {
+        return 4;
+    } else if (materia == "Artes") {
+        return 5;
+    } else {
+        return -1; 
+    }
+}
+
+void editarInformacionEstudiante(Estudiante estudiantes[MAX_ESTUDIANTES], int cantidadEstudiantes) {
+    string nombre;
+    cout << "Ingrese el nombre del estudiante a editar: ";
+    cin >> nombre;
+
+    int indiceEstudiante = -1;
+    for (int i = 0; i < cantidadEstudiantes; i++) {
+        if (estudiantes[i].nombre == nombre) {
+            indiceEstudiante = i;
+            break;
+        }
+    }
+if (indiceEstudiante == -1) {
+        cout << "No se encontró el estudiante." << endl;
+        return;
+    }
+
+    Estudiante& estudiante = estudiantes[indiceEstudiante];
+
+    cout << "Editar información del estudiante:" << endl;
+    cout << "Nuevo nombre: ";
+    cin >> estudiante.nombre;
+    cout << "Nuevo apellido: ";
+    cin >> estudiante.apellido;
+    cout << "Nuevo email: ";
+    cin >> estudiante.email;
+    cout << "Nuevo género: ";
+    cin >> estudiante.genero;
+    cout << "Notas (separadas por espacios): ";
+    for (int i = 0; i < MAX_NOTAS; i++) {
+        cin >> estudiante.notas[i];
+    }
+
+
+    cout << "Información del estudiante actualizada correctamente." << endl;
+    guardarEstudiantes(estudiantes, cantidadEstudiantes);
+}
+
+void verificarNotasMateria(const Estudiante estudiantes[MAX_ESTUDIANTES], int cantidadEstudiantes, const string& materia) {
+    int indiceMateria = obtenerIndiceMateria(materia);
+    if (indiceMateria == -1) {
+        cout << "La materia especificada no fue encontrada." << endl;
+        return;
+    }
+    
+    int aprobados = 0;
+    int aplazados = 0;
+    for (int i = 0; i < cantidadEstudiantes; i++) {
+        if (!estudiantes[i].notas[indiceMateria].empty()) {
+            float nota = stof(estudiantes[i].notas[indiceMateria]);
+            if (nota >= 9.46) {
+                aprobados++;
+            } else if (nota < 9.45) {
+                aplazados++;
+            
+        }
+        }
+    }
+
+    cout << "Materia: " << materia << endl;
+    cout << "Total de estudiantes cursando la materia: " << aprobados + aplazados << endl;
+    cout << "Estudiantes aprobados: " << aprobados << endl;
+    cout << "Estudiantes aplazados: " << aplazados << endl;
 }
 
 void OpMostrarTodosLosEstudiantes(const Estudiante estudiantes[MAX_ESTUDIANTES], int cantidadEstudiantes){
@@ -180,17 +268,26 @@ void agregarEstudiante(Estudiante estudiantes[MAX_ESTUDIANTES], int& cantidadEst
 
 int main() {
 Estudiante estudiantes[MAX_ESTUDIANTES];
-int cantidadEstudiantes = cargarEstudiantes(estudiantes);
+    int cantidadEstudiantes = cargarEstudiantes(estudiantes);
 
     int datos;
-cout<< "presiona 1 o 2 para activar el programa"<<endl;
-cin>> datos;
+    cout << "Presione 1 o 2 para activar el programa: ";
+    cin >> datos;
 
-if(datos==1){
-    OpMostrarTodosLosEstudiantes(estudiantes,cantidadEstudiantes);
-}
-if(datos == 2){
-    agregarEstudiante(estudiantes, cantidadEstudiantes);
-}
-return 0;
+    if (datos == 1) {
+        OpMostrarTodosLosEstudiantes(estudiantes, cantidadEstudiantes);
+    } else if (datos == 2) {
+       editarInformacionEstudiante(estudiantes, cantidadEstudiantes);
+    } else {
+        cout << "Opción inválida." << endl;
+        return 1;
     }
+    verificarNotasMateria(estudiantes, cantidadEstudiantes, "Matematicas");
+    verificarNotasMateria(estudiantes, cantidadEstudiantes, "Sociales");
+    verificarNotasMateria(estudiantes, cantidadEstudiantes, "Biologia");
+    verificarNotasMateria(estudiantes, cantidadEstudiantes, "Fisica");
+    verificarNotasMateria(estudiantes, cantidadEstudiantes, "Educacion Fisica");
+    verificarNotasMateria(estudiantes, cantidadEstudiantes, "Artes");
+
+    return 0;
+}
