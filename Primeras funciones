@@ -266,6 +266,33 @@ void agregarEstudiante(Estudiante estudiantes[MAX_ESTUDIANTES], int& cantidadEst
     cout << "El estudiante ha sido agregado correctamente." << endl;
 }
 
+void mostrarTop10Promedios(const Estudiante estudiantes[MAX_ESTUDIANTES], int cantidadEstudiantes) {
+    pair<float, int> promedios[MAX_ESTUDIANTES];
+
+    for (int i = 0; i < cantidadEstudiantes; i++) {
+        float promedio = calcularPromedio(estudiantes[i]);
+        promedios[i] = make_pair(promedio, i);
+    }
+
+    for (int i = 0; i < cantidadEstudiantes - 1; i++) {
+        for (int j = 0; j < cantidadEstudiantes - i - 1; j++) {
+            if (promedios[j].first < promedios[j + 1].first) {
+                swap(promedios[j], promedios[j + 1]);
+            }
+        }
+    }
+
+    cout << "Top 10 de mejores promedios generales:" << endl;
+    int count = 0;
+    for (int i = 0; i < cantidadEstudiantes && count < 10; i++) {
+        int index = promedios[i].second;
+        float promedio = promedios[i].first;
+        cout << "Nombre: " << estudiantes[index].nombre << " " << estudiantes[index].apellido << "Email:" << estudiantes[index].email << ", Promedio: " << promedio << endl;
+        count++;
+    }
+}
+
+
 int main() {
 Estudiante estudiantes[MAX_ESTUDIANTES];
     int cantidadEstudiantes = cargarEstudiantes(estudiantes);
