@@ -253,6 +253,61 @@ void top10PromediosSeccion(Estudiante estudiantes[MAX_ESTUDIANTES], int cantidad
     }
 }
 
+string obtenerNombreMateria(int materiaIndice) {
+    switch (materiaIndice) {
+        case 0:
+            return "Matemáticas";
+        case 1:
+            return "Sociales";
+        case 2:
+            return "Biología";
+        case 3:
+            return "EF";
+        case 4:
+            return "Artes";
+        default:
+            return "Materia desconocida";
+    }
+}
+
+float obtenerPorcentajeAprobados(Estudiante estudiantes[MAX_ESTUDIANTES], int cantidadEstudiantes, const string& seccion, int materiaIndice) {
+    int totalEstudiantes = 0;
+    int aprobados = 0;
+
+    for (int i = 0; i < cantidadEstudiantes; i++) {
+        if (estudiantes[i].seccion == seccion) {
+            totalEstudiantes++;
+            float nota = stof(estudiantes[i].notas[materiaIndice]);
+            if (nota >= 9.46) {
+                aprobados++;
+            }
+        }
+    }
+
+    if (totalEstudiantes > 0) {
+        return static_cast<float>(aprobados) / totalEstudiantes * 100.0;
+    } else {
+        return 0.0; // No hay estudiantes en la sección especificada
+    }
+}
+
+string calcularRendimientoProfesor(Estudiante estudiantes[MAX_ESTUDIANTES], int cantidadEstudiantes, const string& seccion, int materiaIndice) {
+    float porcentajeAprobados = obtenerPorcentajeAprobados(estudiantes, cantidadEstudiantes, seccion, materiaIndice);
+
+    if (porcentajeAprobados >= 0) {
+        if (porcentajeAprobados >= 70.0) {
+            return "Bueno";
+        } else if (porcentajeAprobados >= 50.0 && porcentajeAprobados < 60.0) {
+            return "Normal";
+        } else {
+            return "Malo";
+        }
+    } else {
+        return "Sección no encontrada";
+    }
+}
+
+
 void mostrarEstudiantes(const Estudiante estudiantes[MAX_ESTUDIANTES], int cantidadEstudiantes) {
     cout << "Estudiantes y sus notas promedio:" << endl;
     for (int i = 0; i < cantidadEstudiantes; i++) {
