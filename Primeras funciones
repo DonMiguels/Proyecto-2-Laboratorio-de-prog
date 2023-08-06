@@ -7,6 +7,7 @@ using namespace std;
 
 const int MAX_ESTUDIANTES = 1200;
 const int MAX_NOTAS = 6;
+const int MAX_PROFESORES = 20;
 
 struct Estudiante {
     string id;
@@ -17,6 +18,17 @@ struct Estudiante {
     string seccion;
     string notas[MAX_NOTAS];
 };
+
+struct Profesor {
+    string id;
+    string nombre;
+    string apellido;
+    string genero;
+    string email;
+    string seccion;
+    string id_materia;
+};
+
 struct Materia {
         string nombre;
         Estudiante estudiantes[MAX_ESTUDIANTES];
@@ -92,6 +104,63 @@ int cargarEstudiantes(Estudiante estudiantes[MAX_ESTUDIANTES]) {
     }
     return cantidadEstudiantes;
 }
+
+int cargarProfesores(Profesor profesores[MAX_PROFESORES]) {
+    ifstream archivo("Datos_Profesores.csv");
+    int cantidadProfesores = 0;
+    if (archivo.is_open()) {
+        string linea;
+        int numeroLinea = 0;
+        while (getline(archivo, linea)) {
+            numeroLinea++;
+            if (numeroLinea > 1) {
+                Profesor profesor;
+                size_t pos = 0;
+                string token;
+                int index = 0;
+                while ((pos = linea.find(";")) != string::npos) {
+                    token = linea.substr(0, pos);
+                    switch (index) {
+                        case 0:
+                            profesor.id = token;
+                            break;
+                        case 1:
+                            profesor.nombre = token;
+                            break;
+                        case 2:
+                            profesor.apellido = token;
+                            break;
+                        case 3:
+                            profesor.genero = token;
+                            break;
+                        case 4:
+                            profesor.email = token;
+                            break;
+                        case 5:
+                            profesor.seccion = token;
+                            break;
+                        case 6:
+                            profesor.id_materia = token;
+                            break;
+                        default:
+                            break;
+                    }
+                    linea.erase(0, pos + 1);
+                    index++;
+                }
+                if (!linea.empty()) {
+                    profesor.id_materia = linea;
+                }
+                profesores[cantidadProfesores] = profesor;
+                cantidadProfesores++;
+            }
+        }
+        archivo.close();
+    }
+    return cantidadProfesores;
+}
+
+
 
 void guardarEstudiantes(const Estudiante estudiantes[MAX_ESTUDIANTES], int cantidadEstudiantes) {
     ofstream archivo("Datos_Estudiantes_revisado.csv");
