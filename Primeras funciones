@@ -598,12 +598,36 @@ int main() {
             obtenerProporcionGenerosMateria(estudiantes, cantidadEstudiantes, materia);}
             break;
             case 7:
+            {string id;
+            cout << "ingrese el id del estudiante que desea borrar: "<<endl;
+            cin >> id;
+            borrarEstudiante(estudiantes, cantidadEstudiantes, id);}
+             break;
+            case 8:
+            {string seccion;
+            cout << "ingrese la seccion: "<<endl;
+            cin >> seccion;
+            top10PromediosSeccion(estudiantes, cantidadEstudiantes, seccion);}
+             break;
+            case 9:
+            {string seccion;
+            int materiaIndice;
+            cout << "ingrese la seccion: "<<endl;
+            cin >> seccion;
+            cout << "Ingrese la materia:" <<endl<<"Presione (0) para Matematicas" <<endl<< "Presione (1) para Sociales"<<endl<<"Presione (2) para Biologia"<<endl<<"Presione (3) para Educacion Fisica"<<endl<< "Presione (4) para Artes."<<endl;
+            cin >> materiaIndice;
+            string rendimiento = calcularRendimientoProfesor(estudiantes, cantidadEstudiantes, seccion, materiaIndice);
+            cout <<"El rendimiento del profesor en la seccion: "<< seccion << "en la materia" << obtenerNombreMateria(materiaIndice)<< " es: "<< rendimiento <<endl;
+            }
+            break;
+            case 10:
             {cout << "Saliendo del programa..." << endl;}
             return 0;
             default:
                 {cout << "Opción inválida. Intente nuevamente." << endl;}
                 break;
         }
+
 
         cout << endl;
     }
