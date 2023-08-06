@@ -695,6 +695,19 @@ int main() {
             }
             break;
             case 10:
+            {
+            mejorRendimientoPorSeccion(estudiantes, cantidadEstudiantes);
+            }
+             break;
+            case 11:
+            {
+            int materiaIndice;
+            cout << "Ingrese la materia:" <<endl<<"Presione (0) para Matematicas" <<endl<< "Presione (1) para Sociales"<<endl<<"Presione (2) para Biologia"<<endl<<"Presione (3) para Educacion Fisica"<<endl<< "Presione (4) para Artes."<<endl;
+            cin>> materiaIndice;
+            mejorRendimientoPorMateria(estudiantes, cantidadEstudiantes, materiaIndice);
+            }
+            break;
+            case 12:
             {cout << "Saliendo del programa..." << endl;}
             return 0;
             default:
