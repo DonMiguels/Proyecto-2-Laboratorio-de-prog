@@ -9,10 +9,12 @@ const int MAX_ESTUDIANTES = 1200;
 const int MAX_NOTAS = 6;
 
 struct Estudiante {
+    string id;
     string nombre;
     string apellido;
     string email;
     string genero;
+    string seccion;
     string notas[MAX_NOTAS];
 };
 struct Materia {
@@ -55,27 +57,32 @@ int cargarEstudiantes(Estudiante estudiantes[MAX_ESTUDIANTES]) {
                     token = linea.substr(0, pos);
                     switch (index) {
                         case 0:
-                            estudiante.nombre = token;
+                            estudiante.id = token;
                             break;
                         case 1:
-                            estudiante.apellido = token;
+                            estudiante.nombre = token;
                             break;
                         case 2:
-                            estudiante.email = token;
+                            estudiante.apellido = token;
                             break;
                         case 3:
                             estudiante.genero = token;
                             break;
+                        case 4:
+                            estudiante.email = token;
+                            break;
+                        case 5:
+                            estudiante.seccion = token;
+                            break;
                         default:
-                            estudiante.notas[index - 4] = token;
+                            estudiante.notas[index - 6] = token;
                             break;
                     }
                     linea.erase(0, pos + 1);
                     index++;
                 }
-                if(!linea.empty()){
-                    estudiante.notas[index - 4] = linea;
-                // corregi el error del salto de linea
+                if (!linea.empty()) {
+                    estudiante.notas[index - 6] = linea;
                 }
                 estudiantes[cantidadEstudiantes] = estudiante;
                 cantidadEstudiantes++;
