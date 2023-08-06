@@ -339,6 +339,49 @@ void mejorRendimientoPorSeccion(Estudiante estudiantes[MAX_ESTUDIANTES], int can
     }
 }
 
+string obtenerNombreSeccion(int seccionIndice) {
+    switch (seccionIndice) {
+        case 0:
+            return "Sección A";
+        case 1:
+            return "Sección B";
+        case 2:
+            return "Sección C";
+        case 3:
+            return "Sección D";
+        case 4:
+            return "Sección E";
+        case 5:
+            return "Sección F";
+        default:
+            return "Sección desconocida";
+    }
+}
+
+void mejorRendimientoPorMateria(Estudiante estudiantes[MAX_ESTUDIANTES], int cantidadEstudiantes, int materiaIndice) {
+    const int NUM_SECCIONES = 6;
+
+    // Crear un arreglo para almacenar los porcentajes de aprobados de cada profesor por materia
+    float porcentajes[NUM_SECCIONES] = {0.0};
+
+    // Calcular los porcentajes de aprobados de cada profesor en la materia especificada
+    for (int i = 0; i < cantidadEstudiantes; i++) {
+        string seccion = estudiantes[i].seccion;
+        float porcentaje = obtenerPorcentajeAprobados(estudiantes, cantidadEstudiantes, seccion, materiaIndice);
+        porcentajes[i] = porcentaje;
+    }
+
+    // Encontrar los profesores con el mejor rendimiento en la materia especificada
+    cout << "Materia: " << obtenerNombreMateria(materiaIndice) << endl;
+    for (int i = 0; i < NUM_SECCIONES; i++) {
+        if (porcentajes[i] >= 0) {
+            cout << "Sección: " << obtenerNombreSeccion(i) << ", Rendimiento: " << porcentajes[i] << "%" << endl;
+        }
+    }
+}
+
+
+
 void mostrarEstudiantes(const Estudiante estudiantes[MAX_ESTUDIANTES], int cantidadEstudiantes) {
     cout << "Estudiantes y sus notas promedio:" << endl;
     for (int i = 0; i < cantidadEstudiantes; i++) {
