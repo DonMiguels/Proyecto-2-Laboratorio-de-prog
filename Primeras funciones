@@ -713,7 +713,9 @@ void obtenerProporcionGenerosMateria(const Estudiante estudiantes[MAX_ESTUDIANTE
 
 int main() {
     Estudiante estudiantes[MAX_ESTUDIANTES];
+    Profesor profesores[MAX_PROFESORES];
     int cantidadEstudiantes = cargarEstudiantes(estudiantes);
+    int cantidadProfesores = cargarProfesores(profesores);
 
     int opcion;
     while (true) {
@@ -768,12 +770,21 @@ int main() {
             borrarEstudiante(estudiantes, cantidadEstudiantes, id);}
              break;
             case 8:
+                agregarProfesor(profesores, cantidadProfesores);
+                break;
+            case 9:
+                editarInformacionProfesor(profesores, cantidadProfesores);
+                break;
+            case 10:
+                borrarProfesor(profesores, cantidadProfesores);
+                break;
+            case 11:
             {string seccion;
             cout << "ingrese la seccion: "<<endl;
             cin >> seccion;
             top10PromediosSeccion(estudiantes, cantidadEstudiantes, seccion);}
              break;
-            case 9:
+            case 12:
             {string seccion;
             int materiaIndice;
             cout << "ingrese la seccion: "<<endl;
@@ -783,13 +794,13 @@ int main() {
             string rendimiento = calcularRendimientoProfesor(estudiantes, cantidadEstudiantes, seccion, materiaIndice);
             cout <<"El rendimiento del profesor en la seccion: "<< seccion << "en la materia" << obtenerNombreMateria(materiaIndice)<< " es: "<< rendimiento <<endl;
             }
-            break;
-            case 10:
+             break;
+            case 13:
             {
             mejorRendimientoPorSeccion(estudiantes, cantidadEstudiantes);
             }
              break;
-            case 11:
+            case 14:
             {
             int materiaIndice;
             cout << "Ingrese la materia:" <<endl<<"Presione (0) para Matematicas" <<endl<< "Presione (1) para Sociales"<<endl<<"Presione (2) para Biologia"<<endl<<"Presione (3) para Educacion Fisica"<<endl<< "Presione (4) para Artes."<<endl;
@@ -797,14 +808,13 @@ int main() {
             mejorRendimientoPorMateria(estudiantes, cantidadEstudiantes, materiaIndice);
             }
             break;
-            case 12:
+            case 15:
             {cout << "Saliendo del programa..." << endl;}
             return 0;
             default:
                 {cout << "Opción inválida. Intente nuevamente." << endl;}
                 break;
         }
-
 
         cout << endl;
     }
