@@ -215,6 +215,43 @@ void borrarEstudiante(Estudiante estudiantes[MAX_ESTUDIANTES], int& cantidadEstu
     }
 }
 
+bool compararPromedios(const Estudiante& estudiante1, const Estudiante& estudiante2) {
+    float promedio1 = calcularPromedio(estudiante1);
+    float promedio2 = calcularPromedio(estudiante2);
+    return promedio1 > promedio2; // Ordenar de mayor a menor promedio
+}
+
+void top10PromediosSeccion(Estudiante estudiantes[MAX_ESTUDIANTES], int cantidadEstudiantes, const string& seccion) {
+    Estudiante estudiantesSeccion[MAX_ESTUDIANTES];
+    int cantidadEstudiantesSeccion = 0;
+
+    for (int i = 0; i < cantidadEstudiantes; i++) {
+        if (estudiantes[i].seccion == seccion) {
+            estudiantesSeccion[cantidadEstudiantesSeccion] = estudiantes[i];
+            cantidadEstudiantesSeccion++;
+        }
+    }
+
+    if (cantidadEstudiantesSeccion == 0) {
+        cout << "No se encontraron estudiantes en la sección especificada." << endl;
+        return;
+    }
+
+    // Ordenar estudiantes por promedio (bubble sort)
+    for (int i = 0; i < cantidadEstudiantesSeccion - 1; i++) {
+        for (int j = 0; j < cantidadEstudiantesSeccion - i - 1; j++) {
+            if (compararPromedios(estudiantesSeccion[j], estudiantesSeccion[j + 1])) {
+                swap(estudiantesSeccion[j], estudiantesSeccion[j + 1]);
+            }
+        }
+    }
+
+    cout << "Top 10 de mejores promedios para la sección " << seccion << ":" << endl;
+    for (int i = 0; i < min(10, cantidadEstudiantesSeccion); i++) {
+        cout << "Nombre: " << estudiantesSeccion[i].nombre << " " << estudiantesSeccion[i].apellido
+             << ", Promedio: " << calcularPromedio(estudiantesSeccion[i]) << endl;
+    }
+}
 
 void mostrarEstudiantes(const Estudiante estudiantes[MAX_ESTUDIANTES], int cantidadEstudiantes) {
     cout << "Estudiantes y sus notas promedio:" << endl;
