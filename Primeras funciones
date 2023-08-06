@@ -380,6 +380,96 @@ void mejorRendimientoPorMateria(Estudiante estudiantes[MAX_ESTUDIANTES], int can
     }
 }
 
+void agregarProfesor(Profesor profesores[MAX_PROFESORES], int& cantidadProfesores) {
+    if (cantidadProfesores >= MAX_PROFESORES) {
+        cout << "No se pueden agregar más profesores. La capacidad máxima ha sido alcanzada." << endl;
+        return;
+    }
+
+    Profesor nuevoProfesor;
+    cout << "Ingrese los datos del nuevo profesor:" << endl;
+    cout << "Nombre: ";
+    cin >> nuevoProfesor.nombre;
+    cout << "Apellido: ";
+    cin >> nuevoProfesor.apellido;
+    cout << "Email: ";
+    cin >> nuevoProfesor.email;
+    cout << "Género: ";
+    cin >> nuevoProfesor.genero;
+    cout << "Sección: ";
+    cin >> nuevoProfesor.seccion;
+    cout << "ID de materia: ";
+    cin >> nuevoProfesor.id_materia;
+
+    profesores[cantidadProfesores] = nuevoProfesor;
+    cantidadProfesores++;
+
+    guardarProfesores(profesores, cantidadProfesores);
+
+    cout << "El profesor ha sido agregado correctamente." << endl;
+}
+
+void editarInformacionProfesor(Profesor profesores[MAX_PROFESORES], int cantidadProfesores) {
+    int idProfesor;
+    cout << "Ingrese el ID del profesor a editar: ";
+    cin >> idProfesor;
+
+    int indiceProfesor = -1;
+    for (int i = 0; i < cantidadProfesores; i++) {
+        if (i == idProfesor) {
+            indiceProfesor = i;
+            break;
+        }
+    }
+    if (indiceProfesor == -1) {
+        cout << "No se encontró el profesor." << endl;
+        return;
+    }
+
+    Profesor& profesor = profesores[indiceProfesor];
+
+    cout << "Editar información del profesor:" << endl;
+    cout << "Nuevo nombre: ";
+    cin >> profesor.nombre;
+    cout << "Nuevo apellido: ";
+    cin >> profesor.apellido;
+    cout << "Nuevo email: ";
+    cin >> profesor.email;
+    cout << "Nuevo género: ";
+    cin >> profesor.genero;
+    cout << "Nueva sección: ";
+    cin >> profesor.seccion;
+    cout << "Nuevo ID de materia: ";
+    cin >> profesor.id_materia;
+
+    cout << "Información del profesor actualizada correctamente." << endl;
+    guardarProfesores(profesores, cantidadProfesores);
+}
+
+void borrarProfesor(Profesor profesores[MAX_PROFESORES], int& cantidadProfesores) {
+    int idProfesor;
+    cout << "Ingrese el ID del profesor a borrar: ";
+    cin >> idProfesor;
+
+    int indiceProfesor = -1;
+    for (int i = 0; i < cantidadProfesores; i++) {
+        if (i == idProfesor) {
+            indiceProfesor = i;
+            break;
+        }
+    }
+    if (indiceProfesor == -1) {
+        cout << "No se encontró el profesor." << endl;
+        return;
+    }
+
+    // Eliminar el profesor moviendo el último profesor a la posición del profesor a borrar
+    profesores[indiceProfesor] = profesores[cantidadProfesores - 1];
+    cantidadProfesores--;
+
+    cout << "El profesor ha sido eliminado correctamente." << endl;
+    guardarProfesores(profesores, cantidadProfesores);
+}
 
 
 void mostrarEstudiantes(const Estudiante estudiantes[MAX_ESTUDIANTES], int cantidadEstudiantes) {
