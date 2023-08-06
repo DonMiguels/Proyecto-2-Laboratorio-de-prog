@@ -307,6 +307,37 @@ string calcularRendimientoProfesor(Estudiante estudiantes[MAX_ESTUDIANTES], int 
     }
 }
 
+void mejorRendimientoPorSeccion(Estudiante estudiantes[MAX_ESTUDIANTES], int cantidadEstudiantes) {
+    const int NUM_MATERIAS = 5;
+
+    // Crea una matriz para almacenar los porcentajes de aprobados de cada profesor por sección y materia
+    float porcentajes[MAX_ESTUDIANTES][NUM_MATERIAS] = {0.0};
+
+    // Cuenta la cantidad de profesores en cada sección
+    int cantidadProfesores[MAX_ESTUDIANTES] = {0};
+
+    // Calcula los porcentajes de aprobados de cada profesor en cada sección y materia
+    for (int i = 0; i < cantidadEstudiantes; i++) {
+        string seccion = estudiantes[i].seccion;
+        int materiaIndice = 0;
+        for (int j = 0; j < NUM_MATERIAS; j++) {
+            float porcentaje = obtenerPorcentajeAprobados(estudiantes, cantidadEstudiantes, seccion, j);
+            porcentajes[cantidadProfesores[i]][materiaIndice++] = porcentaje;
+        }
+        cantidadProfesores[i]++;
+    }
+
+    // Encuentra los profesores con el mejor rendimiento por sección
+    for (int i = 0; i < cantidadEstudiantes; i++) {
+        cout << "Sección: " << estudiantes[i].seccion << endl;
+        for (int j = 0; j < NUM_MATERIAS; j++) {
+            if (porcentajes[i][j] >= 0) {
+                cout << "Materia: " << obtenerNombreMateria(j) << ", Rendimiento: " << porcentajes[i][j] << "%" << endl;
+            }
+        }
+        cout << endl;
+    }
+}
 
 void mostrarEstudiantes(const Estudiante estudiantes[MAX_ESTUDIANTES], int cantidadEstudiantes) {
     cout << "Estudiantes y sus notas promedio:" << endl;
