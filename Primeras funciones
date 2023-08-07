@@ -1,12 +1,11 @@
-
 #include <iostream>
 #include <fstream>
 #include <string>
 
 using namespace std;
 
-const int MAX_ESTUDIANTES = 1200;
-const int MAX_NOTAS = 6;
+const int MAX_ESTUDIANTES = 2000;
+const int MAX_NOTAS = 5;
 const int MAX_PROFESORES = 20;
 
 struct Estudiante {
@@ -30,30 +29,28 @@ struct Profesor {
 };
 
 struct Materia {
-        string nombre;
-        Estudiante estudiantes[MAX_ESTUDIANTES];
-        string cantidadAlumnos;
-    };
+    string nombre;
+    Estudiante estudiantes[MAX_ESTUDIANTES];
+    int cantidadAlumnos;
+};
 
 float calcularPromedio(const Estudiante& estudiante) {
     float suma = 0.0;
     int contador = 0;
     for (int i = 0; i < MAX_NOTAS; i++) {
-        if (!estudiante.notas[i].empty()){
-            try{
-                suma+= stof(estudiante.notas[i]);
+        if (!estudiante.notas[i].empty()) {
+            try {
+                suma += stof(estudiante.notas[i]);
                 contador++;
-            } catch (const invalid_argument&){
-
+            } catch (const invalid_argument&) {
             }
         }
-       
     }
     return contador > 0 ? suma / contador : 0.0;
 }
 
 int cargarEstudiantes(Estudiante estudiantes[MAX_ESTUDIANTES]) {
-    ifstream archivo("Datos_Estudiantes_revisado.csv");
+    ifstream archivo("datos_estudiantes.csv");
     int cantidadEstudiantes = 0;
     if (archivo.is_open()) {
         string linea;
@@ -65,7 +62,7 @@ int cargarEstudiantes(Estudiante estudiantes[MAX_ESTUDIANTES]) {
                 size_t pos = 0;
                 string token;
                 int index = 0;
-                while ((pos = linea.find(";")) != string::npos) {
+                while ((pos = linea.find(",")) != string::npos) {
                     token = linea.substr(0, pos);
                     switch (index) {
                         case 0:
@@ -106,7 +103,7 @@ int cargarEstudiantes(Estudiante estudiantes[MAX_ESTUDIANTES]) {
 }
 
 int cargarProfesores(Profesor profesores[MAX_PROFESORES]) {
-    ifstream archivo("Datos_Profesores.csv");
+    ifstream archivo("datos_profesores.csv");
     int cantidadProfesores = 0;
     if (archivo.is_open()) {
         string linea;
@@ -118,7 +115,7 @@ int cargarProfesores(Profesor profesores[MAX_PROFESORES]) {
                 size_t pos = 0;
                 string token;
                 int index = 0;
-                while ((pos = linea.find(";")) != string::npos) {
+                while ((pos = linea.find(",")) != string::npos) {
                     token = linea.substr(0, pos);
                     switch (index) {
                         case 0:
@@ -161,28 +158,29 @@ int cargarProfesores(Profesor profesores[MAX_PROFESORES]) {
 }
 
 
-
 void guardarEstudiantes(const Estudiante estudiantes[MAX_ESTUDIANTES], int cantidadEstudiantes) {
-    ofstream archivo("Datos_Estudiantes_revisado.csv");
+    ofstream archivo("datos_estudiantes.csv");
     if (archivo.is_open()) {
         for (int i = 0; i < cantidadEstudiantes; i++) {
-            archivo << estudiantes[i].nombre << ";" << estudiantes[i].apellido << ";" << estudiantes[i].email << ";"
-                    << estudiantes[i].genero;
+            archivo << estudiantes[i].id << "," << estudiantes[i].nombre << "," << estudiantes[i].apellido << "," << estudiantes[i].genero << "," << estudiantes[i].email<< "," << estudiantes[i].seccion;
+                    
             for (int j = 0; j < MAX_NOTAS; j++) {
-                archivo << ";" << estudiantes[i].notas[j];
+                archivo << "," << estudiantes[i].notas[j];
             }
             archivo << endl;
         }
         archivo.close();
+    } else {
+        cout << "No se pudo abrir el archivo para guardar los nuevos datos." << endl;
     }
 }
 
 void guardarProfesores(const Profesor profesores[MAX_PROFESORES], int cantidadProfesores) {
-    ofstream archivo("Datos_Profesores.csv");
+    ofstream archivo("datos_profesores.csv");
     if (archivo.is_open()) {
         for (int i = 0; i < cantidadProfesores; i++) {
-            archivo << profesores[i].id << ";" << profesores[i].nombre << ";" << profesores[i].apellido << ";"
-                    << profesores[i].genero << ";" << profesores[i].email << ";" << profesores[i].seccion << ";"
+            archivo << profesores[i].id << "," << profesores[i].nombre << "," << profesores[i].apellido << ","
+                    << profesores[i].genero << "," << profesores[i].email << "," << profesores[i].seccion << ","
                     << profesores[i].id_materia << endl;
         }
         archivo.close();
@@ -218,7 +216,7 @@ void borrarEstudiante(Estudiante estudiantes[MAX_ESTUDIANTES], int& cantidadEstu
 bool compararPromedios(const Estudiante& estudiante1, const Estudiante& estudiante2) {
     float promedio1 = calcularPromedio(estudiante1);
     float promedio2 = calcularPromedio(estudiante2);
-    return promedio1 > promedio2; // Ordenar de mayor a menor promedio
+    return promedio1 < promedio2; // Ordenar de menor a mayor promedio
 }
 
 void top10PromediosSeccion(Estudiante estudiantes[MAX_ESTUDIANTES], int cantidadEstudiantes, const string& seccion) {
@@ -306,7 +304,6 @@ string calcularRendimientoProfesor(Estudiante estudiantes[MAX_ESTUDIANTES], int 
         return "Sección no encontrada";
     }
 }
-
 void mejorRendimientoPorSeccion(Estudiante estudiantes[MAX_ESTUDIANTES], int cantidadEstudiantes) {
     const int NUM_MATERIAS = 5;
 
@@ -471,27 +468,72 @@ void borrarProfesor(Profesor profesores[MAX_PROFESORES], int& cantidadProfesores
     guardarProfesores(profesores, cantidadProfesores);
 }
 
+void mostrarEstudiantesConMateriasAplazadas(const Estudiante estudiantes[MAX_ESTUDIANTES], int cantidadEstudiantes) {
+    int maxMateriasAplazadas = 0;
+    int estudiantesConMaxAplazadas[MAX_ESTUDIANTES];
+    int cantidadEstudiantesConMaxAplazadas = 0;
+
+    for (int i = 0; i < cantidadEstudiantes; i++) {
+        int materiasAplazadas = 0;
+        for (int j = 0; j < MAX_NOTAS; j++) {
+            if (!estudiantes[i].notas[j].empty()) {
+                float nota = stof(estudiantes[i].notas[j]);
+                if (nota < 9.45) {
+                    materiasAplazadas++;
+                }
+            }
+        }
+
+        if (materiasAplazadas > maxMateriasAplazadas) {
+            maxMateriasAplazadas = materiasAplazadas;
+            cantidadEstudiantesConMaxAplazadas = 1;
+            estudiantesConMaxAplazadas[0] = i;
+        } else if (materiasAplazadas == maxMateriasAplazadas) {
+            estudiantesConMaxAplazadas[cantidadEstudiantesConMaxAplazadas] = i;
+            cantidadEstudiantesConMaxAplazadas++;
+        }
+    }
+
+    if (cantidadEstudiantesConMaxAplazadas > 0) {
+        cout << "Estudiantes con mayor cantidad de materias aplazadas:" << endl;
+        for (int i = 0; i < cantidadEstudiantesConMaxAplazadas; i++) {
+            int index = estudiantesConMaxAplazadas[i];
+            cout << "Nombre: " << estudiantes[index].nombre << " " << estudiantes[index].apellido << endl;
+            cout << "Email: " << estudiantes[index].email << endl;
+            cout << "Género: " << estudiantes[index].genero << endl;
+            cout << "Cantidad de materias aplazadas: " << maxMateriasAplazadas << endl;
+            cout << endl;
+        }
+    } else {
+        cout << "No se encontraron estudiantes con materias aplazadas." << endl;
+    }
+}
+
+
 
 void mostrarEstudiantes(const Estudiante estudiantes[MAX_ESTUDIANTES], int cantidadEstudiantes) {
     cout << "Estudiantes y sus notas promedio:" << endl;
     for (int i = 0; i < cantidadEstudiantes; i++) {
         float promedio = calcularPromedio(estudiantes[i]);
-        cout << "Nombre: " << estudiantes[i].nombre << " " << estudiantes[i].apellido << ", Promedio: " << promedio << endl;
+        cout << "Nombre: " << estudiantes[i].nombre << " " << estudiantes[i].apellido << ",  Email:  " << estudiantes[i].email << ",  Genero  " << estudiantes[i].genero << ", Promedio: " << promedio << endl;
     }
 }
+
 void imprimirBoletaEstudiante(const Estudiante& estudiante) {
 
     
-    cout << endl << endl << "========Boleta de Notas========" << endl;
+    cout << endl << endl << "================Boleta de Notas================" << endl;
+    cout << "Nombre y apellido:" << estudiante.nombre << " "<< estudiante.apellido << endl;
     cout << "Email: " << estudiante.email << endl;
-    cout << "Genero: " << estudiante.genero << endl << endl;
+    cout << "Genero: " << estudiante.genero << endl;
+    cout << "Seccion: " << estudiante.seccion << endl;
     cout << endl << endl << "Notas:" << endl;
     for (int i = 0; i < MAX_NOTAS; i++) {
         cout << "Nota " << i + 1 << ": " << estudiante.notas[i] << endl;
         
     }
 
-     
+   cout << "=============================================" << endl;  
 }
 void buscarEstudiante(const Estudiante estudiantes[MAX_ESTUDIANTES], int cantidadEstudiantes, const string& nombre) {
     bool encontrado = false;
@@ -514,13 +556,6 @@ void buscarEstudiante(const Estudiante estudiantes[MAX_ESTUDIANTES], int cantida
     }
 }
 
-void OpBuscarEstudiante(const Estudiante estudiantes[MAX_ESTUDIANTES], int cantidadEstudiantes){
-string nombre;
-cout <<"ingrese el nombre del estudiante que deseas buscar: ";
-cin >> nombre;
-
-buscarEstudiante(estudiantes, cantidadEstudiantes, nombre);
-}
 int obtenerIndiceMateria(const string& materia) {
     if (materia == "Matematicas") {
         return 0;
@@ -604,7 +639,15 @@ void verificarNotasMateria(const Estudiante estudiantes[MAX_ESTUDIANTES], int ca
     cout << "Estudiantes aplazados: " << aplazados << endl;
 }
 
-void OpMostrarTodosLosEstudiantes(const Estudiante estudiantes[MAX_ESTUDIANTES], int cantidadEstudiantes){
+void OpBuscarEstudiante(const Estudiante estudiantes[MAX_ESTUDIANTES], int cantidadEstudiantes) {
+    string nombre;
+    cout << "Ingrese el nombre del estudiante que desea buscar: ";
+    cin >> nombre;
+
+    buscarEstudiante(estudiantes, cantidadEstudiantes, nombre);
+}
+
+void OpMostrarTodosLosEstudiantes(const Estudiante estudiantes[MAX_ESTUDIANTES], int cantidadEstudiantes) {
     mostrarEstudiantes(estudiantes, cantidadEstudiantes);
 }
 
@@ -615,7 +658,9 @@ void agregarEstudiante(Estudiante estudiantes[MAX_ESTUDIANTES], int& cantidadEst
     }
 
     Estudiante nuevoEstudiante;
-    cout << "Ingrese los datos del nuevo estudiante:" << endl;
+    cout << "Ingrese los datos del nuevo estudiante:" << endl << endl;
+    cout << "id: ";
+    cin >> nuevoEstudiante.id;
     cout << "Nombre: ";
     cin >> nuevoEstudiante.nombre;
     cout << "Apellido: ";
@@ -624,6 +669,8 @@ void agregarEstudiante(Estudiante estudiantes[MAX_ESTUDIANTES], int& cantidadEst
     cin >> nuevoEstudiante.email;
     cout << "Género: ";
     cin >> nuevoEstudiante.genero;
+    cout << "seccion: " ;
+    cin >> nuevoEstudiante.seccion;
     cout << "Notas (separadas por espacios): ";
     for (int i = 0; i < MAX_NOTAS; i++) {
         cin >> nuevoEstudiante.notas[i];
@@ -636,6 +683,7 @@ void agregarEstudiante(Estudiante estudiantes[MAX_ESTUDIANTES], int& cantidadEst
 
     cout << "El estudiante ha sido agregado correctamente." << endl;
 }
+
 
 void mostrarTop10Promedios(const Estudiante estudiantes[MAX_ESTUDIANTES], int cantidadEstudiantes) {
     pair<float, int> promedios[MAX_ESTUDIANTES];
@@ -658,7 +706,7 @@ void mostrarTop10Promedios(const Estudiante estudiantes[MAX_ESTUDIANTES], int ca
     for (int i = 0; i < cantidadEstudiantes && count < 10; i++) {
         int index = promedios[i].second;
         float promedio = promedios[i].first;
-        cout << "Nombre: " << estudiantes[index].nombre << " " << estudiantes[index].apellido << "Email:" << estudiantes[index].email << ", Promedio: " << promedio << endl;
+        cout << "Nombre: " << estudiantes[index].nombre << " " << estudiantes[index].apellido << ", Email:" << estudiantes[index].email << ", Promedio: " << promedio << endl;
         count++;
     }
 }
@@ -722,11 +770,22 @@ int main() {
          cout << "============================== Menú ================================" << endl;
     cout << "Presiona (1). Mostrar todos los estudiantes y sus promedios" << endl;
     cout << "Presiona (2). Buscar estudiante" << endl;
-    cout << "Presiona (3). Editar información de un estudiante" << endl;
-    cout << "Presiona (4). Verificar notas de una materia" << endl;
-    cout << "Presiona (5). Mostrar top 10 mejores promedios"<<endl;
-    cout << "Presiona (6). Proporcion de estudiantes aplazados y aprobados por genero"<<endl;
-    cout << "Presiona (7). Salir" << endl;
+    cout << "Presiona (3). Agregar estudiante" << endl;
+    cout << "Presiona (4). Editar información de un estudiante" << endl;
+    cout << "Presiona (5). Verificar notas de una materia" << endl;
+    cout << "Presiona (6). Mostrar top 10 mejores promedios en general"<<endl;
+    cout << "Presiona (7). Proporcion de estudiantes aplazados y aprobados por genero"<<endl;
+    cout << "Presiona (8). Borrar un estudiante" << endl;
+    cout << "Presiona (9). Agregar un profesor" << endl;
+    cout << "Presiona (10). Editar información de un profesor" << endl;
+    cout << "Presiona (11). Borrar un profesor" << endl;
+    cout << "Presiona (12). Mostrar top 10 mejores promedios por seccion"<<endl;
+    cout << "Presiona (13). Ver el rendimiento de un profesor"<<endl;
+    cout << "Presiona (14). Ver los profesores con mejor rendimiento por seccion" << endl;
+    cout << "Presiona (15). Ver los profesores con mejor rendimiento por materia" << endl;
+    cout << "Presiona (16). Ver los estudiantes con mayor cantidad de materias aplazadas" << endl;
+    cout << "Presiona (17). salir"<<endl;
+    
     cout << "==========================================================================" << endl;
     cout << "Ingrese la opción deseada: ";
         cin >> opcion;
@@ -744,9 +803,12 @@ int main() {
                 }
                 break;
             case 3:
-                editarInformacionEstudiante(estudiantes, cantidadEstudiantes);
+               agregarEstudiante(estudiantes, cantidadEstudiantes);
                 break;
             case 4:
+                editarInformacionEstudiante(estudiantes, cantidadEstudiantes);
+                break;
+            case 5:
                 {
                     string materia;
                     cout << "Ingrese el nombre de la materia: ";
@@ -754,37 +816,37 @@ int main() {
                     verificarNotasMateria(estudiantes, cantidadEstudiantes, materia);
                 }
                 break;
-            case 5:
+            case 6:
                 {mostrarTop10Promedios(estudiantes, cantidadEstudiantes);}
                 break;
-            case 6:
+            case 7:
             {string materia;
             cout << "ingrese el nombre de la materia: "<<endl;
             cin >> materia;
             obtenerProporcionGenerosMateria(estudiantes, cantidadEstudiantes, materia);}
             break;
-            case 7:
+            case 8:
             {string id;
             cout << "ingrese el id del estudiante que desea borrar: "<<endl;
             cin >> id;
             borrarEstudiante(estudiantes, cantidadEstudiantes, id);}
              break;
-            case 8:
+              case 9:
                 agregarProfesor(profesores, cantidadProfesores);
                 break;
-            case 9:
+            case 10:
                 editarInformacionProfesor(profesores, cantidadProfesores);
                 break;
-            case 10:
+            case 11:
                 borrarProfesor(profesores, cantidadProfesores);
                 break;
-            case 11:
+            case 12:
             {string seccion;
             cout << "ingrese la seccion: "<<endl;
             cin >> seccion;
             top10PromediosSeccion(estudiantes, cantidadEstudiantes, seccion);}
              break;
-            case 12:
+            case 13:
             {string seccion;
             int materiaIndice;
             cout << "ingrese la seccion: "<<endl;
@@ -792,15 +854,15 @@ int main() {
             cout << "Ingrese la materia:" <<endl<<"Presione (0) para Matematicas" <<endl<< "Presione (1) para Sociales"<<endl<<"Presione (2) para Biologia"<<endl<<"Presione (3) para Educacion Fisica"<<endl<< "Presione (4) para Artes."<<endl;
             cin >> materiaIndice;
             string rendimiento = calcularRendimientoProfesor(estudiantes, cantidadEstudiantes, seccion, materiaIndice);
-            cout <<"El rendimiento del profesor en la seccion: "<< seccion << "en la materia" << obtenerNombreMateria(materiaIndice)<< " es: "<< rendimiento <<endl;
+            cout <<"El rendimiento del profesor en la seccion "<< seccion << " en la materia" << obtenerNombreMateria(materiaIndice)<< " es: "<< rendimiento <<endl;
             }
              break;
-            case 13:
+            case 14:
             {
             mejorRendimientoPorSeccion(estudiantes, cantidadEstudiantes);
             }
              break;
-            case 14:
+            case 15:
             {
             int materiaIndice;
             cout << "Ingrese la materia:" <<endl<<"Presione (0) para Matematicas" <<endl<< "Presione (1) para Sociales"<<endl<<"Presione (2) para Biologia"<<endl<<"Presione (3) para Educacion Fisica"<<endl<< "Presione (4) para Artes."<<endl;
@@ -808,7 +870,11 @@ int main() {
             mejorRendimientoPorMateria(estudiantes, cantidadEstudiantes, materiaIndice);
             }
             break;
-            case 15:
+            case 16:
+            {
+            mostrarEstudiantesConMateriasAplazadas(estudiantes, cantidadEstudiantes);
+            }
+            case 17:
             {cout << "Saliendo del programa..." << endl;}
             return 0;
             default:
